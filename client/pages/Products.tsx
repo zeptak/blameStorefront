@@ -1,35 +1,29 @@
-import { useEffect, useState } from "react";
-import { medusaClient, StorefrontProduct } from "@/lib/medusa-client";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useProducts } from "@/hooks/useProducts";
+import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Search } from "lucide-react";
 
 export default function Products() {
-  const [products, setProducts] = useState<StorefrontProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "rental" | "digital">("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        // TODO: Implement MedusaJS products fetch
-        // This will need to call the MedusaJS backend to fetch products
-        // with both rental and digital product types
-        setProducts([]);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const filterType = (searchParams.get("type") as "all" | "rental" | "digital" | null) || "all";
+  const queryType = filterType === "all" ? undefined : filterType;
 
-    fetchProducts();
-  }, []);
+  const { data: products = [], isLoading } = useProducts(queryType, search);
 
-  const filteredProducts = products.filter((p) => {
-    if (filter === "all") return true;
-    return p.type === filter;
-  });
+  const handleFilterChange = (type: "all" | "rental" | "digital") => {
+    setSearchParams(type === "all" ? {} : { type });
+  };
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Search is already applied via the hook
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -40,15 +34,31 @@ export default function Products() {
         </p>
       </div>
 
+      {/* Search Bar */}
+      <form onSubmit={handleSearch} className="mb-8">
+        <div className="relative">
+          <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 bg-white border-border"
+          />
+        </div>
+      </form>
+
       {/* Filter Tabs */}
-      <div className="flex gap-3 mb-8">
+      <div className="flex gap-3 mb-8 flex-wrap">
         {["all", "rental", "digital"].map((type) => (
           <Button
             key={type}
-            variant={filter === type ? "default" : "outline"}
-            onClick={() => setFilter(type as any)}
+            variant={filterType === type ? "default" : "outline"}
+            onClick={() => handleFilterChange(type as any)}
             className={
-              filter === type ? "bg-primary text-white" : "border-border"
+              filterType === type
+                ? "bg-primary text-white"
+                : "border-border hover:border-primary"
             }
           >
             {type === "all"
@@ -61,60 +71,32 @@ export default function Products() {
       </div>
 
       {/* Products Grid */}
-      {loading ? (
+      {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="space-y-4">
               <Skeleton className="h-48 w-full rounded-lg" />
               <Skeleton className="h-6 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-10 w-full" />
             </div>
           ))}
         </div>
-      ) : filteredProducts.length === 0 ? (
+      ) : products.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-muted-foreground mb-4">No products found</p>
+          <p className="text-muted-foreground mb-4">
+            {search ? "No products match your search" : "No products found"}
+          </p>
           <p className="text-sm text-muted-foreground">
-            Check back soon for more equipment and resources
+            {search
+              ? "Try adjusting your search terms"
+              : "Check back soon for more equipment and resources"}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="border border-border rounded-lg overflow-hidden hover:shadow-lg transition"
-            >
-              <div className="bg-muted h-48 flex items-center justify-center">
-                {product.thumbnail ? (
-                  <img
-                    src={product.thumbnail}
-                    alt={product.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-muted-foreground">No image</div>
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-foreground mb-2">
-                  {product.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {product.description}
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs bg-secondary text-primary px-2 py-1 rounded">
-                    {product.type === "rental"
-                      ? "Equipment Rental"
-                      : "Digital Product"}
-                  </span>
-                  <Button size="sm" className="bg-primary hover:bg-primary/90">
-                    View Details
-                  </Button>
-                </div>
-              </div>
-            </div>
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}
