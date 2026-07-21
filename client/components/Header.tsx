@@ -1,103 +1,59 @@
-import { Link } from "react-router-dom";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, ShoppingBag, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+const navigation = [
+  { label: "Home", to: "/" },
+  { label: "Gear & tools", to: "/products" },
+  { label: "About BLAME", to: "/about" },
+];
+
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   return (
-    <header className="border-b border-border bg-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-sm">
-              B
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-primary text-sm">BLAME</span>
-              <span className="text-xs text-muted-foreground leading-none">
-                Sound & Production
-              </span>
-            </div>
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-studio-950/95 text-studio-50 backdrop-blur-xl">
+      <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12">
+        <Link to="/" className="group flex items-center gap-3" onClick={() => setIsOpen(false)}>
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-mist font-display text-xl font-bold text-studio-950 transition group-hover:rotate-12">B</span>
+          <span>
+            <span className="block font-display text-lg font-bold leading-none tracking-[-0.04em]">BLAME</span>
+            <span className="mt-1 block text-[9px] font-semibold uppercase tracking-[0.2em] text-studio-400">Sound / Production</span>
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-8 md:flex">
+          {navigation.map(({ label, to }) => (
+            <Link key={to} to={to} className={cn("text-sm transition", location.pathname === to ? "text-brand-mist" : "text-studio-300 hover:text-white")}>
+              {label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <Link to="/cart">
+            <Button variant="ghost" size="icon" className="text-studio-200 hover:bg-white/10 hover:text-brand-mist" aria-label="Open cart"><ShoppingBag className="h-5 w-5" /></Button>
           </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex gap-8">
-            <Link
-              to="/"
-              className="text-sm font-medium text-foreground hover:text-primary transition"
-            >
-              Home
-            </Link>
-            <Link
-              to="/products"
-              className="text-sm font-medium text-foreground hover:text-primary transition"
-            >
-              Shop
-            </Link>
-            <Link
-              to="/about"
-              className="text-sm font-medium text-foreground hover:text-primary transition"
-            >
-              About
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <Link to="/cart">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-secondary"
-              >
-                <ShoppingCart className="w-5 h-5 text-primary" />
-              </Button>
-            </Link>
-
-            {/* Mobile menu button */}
-            <button
-              className="md:hidden"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
-            >
-              {isOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+          <button className="rounded-md p-2 text-studio-200 hover:bg-white/10 md:hidden" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <nav className="md:hidden pb-4 flex flex-col gap-3">
-            <Link
-              to="/"
-              className="text-sm font-medium text-foreground hover:text-primary transition block py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              to="/products"
-              className="text-sm font-medium text-foreground hover:text-primary transition block py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Shop
-            </Link>
-            <Link
-              to="/about"
-              className="text-sm font-medium text-foreground hover:text-primary transition block py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              About
-            </Link>
-          </nav>
-        )}
       </div>
+
+      {isOpen && (
+        <nav className="border-t border-white/10 px-5 py-5 md:hidden">
+          <div className="flex flex-col gap-1">
+            {navigation.map(({ label, to }) => (
+              <Link key={to} to={to} onClick={() => setIsOpen(false)} className={cn("rounded-lg px-3 py-3 text-sm", location.pathname === to ? "bg-white/10 text-brand-mist" : "text-studio-300")}>
+                {label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

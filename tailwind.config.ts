@@ -14,6 +14,15 @@ export default {
     },
     extend: {
       colors: {
+        "studio-950": "#081011",
+        "studio-900": "#0d191a",
+        "studio-800": "#152526",
+        "studio-300": "#b3c5c4",
+        "studio-400": "#8ba3a2",
+        "studio-500": "#627b7a",
+        "brand-teal": "#006064",
+        "brand-mist": "#B2DFDB",
+        "brand-silver": "#E0E0E0",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -57,6 +66,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        display: ["Space Grotesk", "sans-serif"],
+        mono: ["DM Mono", "monospace"],
+      },
+      boxShadow: {
+        glow: "0 0 60px rgba(178, 223, 219, 0.14)",
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -1,5 +1,5 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -12,33 +12,33 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
+    --background: 195 33% 5%;
+    --foreground: 180 15% 96%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card: 190 29% 8%;
+    --card-foreground: 180 15% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover: 190 29% 8%;
+    --popover-foreground: 180 15% 96%;
 
     --primary: 182.4 100% 19.8%;
-    --primary-foreground: 0 0% 98%;
+    --primary-foreground: 180 15% 96%;
 
     --secondary: 176.3 50% 86.9%;
     --secondary-foreground: 182.4 100% 19.8%;
 
-    --muted: 0 0% 88%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 190 25% 14%;
+    --muted-foreground: 177 13% 58%;
 
-    --accent: 182.4 100% 19.8%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 176.3 50% 86.9%;
+    --accent-foreground: 182.4 100% 19.8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 182.4 100% 19.8%;
+    --border: 180 14% 18%;
+    --input: 180 14% 18%;
+    --ring: 176.3 50% 86.9%;
 
     --radius: 0.5rem;
 
@@ -104,7 +104,13 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", sans-serif;
+  }
+
+  ::selection {
+    background: #b2dfdb;
+    color: #081011;
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
