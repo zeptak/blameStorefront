@@ -13,6 +13,7 @@ import About from "./pages/About";
 import Products from "./pages/Products";
 import RentalDetail from "./pages/RentalDetail";
 import DigitalDetail from "./pages/DigitalDetail";
+import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
 
@@ -54,6 +55,14 @@ const App = () => (
             element={
               <Layout>
                 <About />
+              </Layout>
+            }
+          />
+          <Route
+            path="/products/:id"
+            element={
+              <Layout>
+                <ProductDetail />
               </Layout>
             }
           />
