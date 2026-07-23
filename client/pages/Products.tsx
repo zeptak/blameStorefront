@@ -11,7 +11,7 @@ export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const filterType = (searchParams.get("type") as "all" | "rental" | "digital" | null) || "all";
-  const { data: products = [], isLoading } = useProducts(filterType === "all" ? undefined : filterType, search);
+  const { data: products = [], isLoading, isError, error, refetch } = useProducts(filterType === "all" ? undefined : filterType, search);
 
   const handleFilterChange = (type: "all" | "rental" | "digital") => setSearchParams(type === "all" ? {} : { type });
 
@@ -41,6 +41,13 @@ export default function Products() {
 
         {isLoading ? (
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, index) => <div key={index} className="space-y-4"><Skeleton className="h-64 w-full rounded-2xl bg-studio-900" /><Skeleton className="h-6 w-3/4 bg-studio-900" /><Skeleton className="h-4 w-1/2 bg-studio-900" /></div>)}</div>
+        ) : isError ? (
+          <div className="rounded-2xl border border-red-300/20 bg-red-300/5 px-6 py-24 text-center">
+            <p className="font-display text-2xl">The catalog is unavailable.</p>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-studio-400">We couldn’t load the Medusa catalog right now. Please try again.</p>
+            <Button onClick={() => refetch()} className="mt-6 rounded-full bg-brand-mist text-studio-950 hover:bg-white">Try again</Button>
+            {error instanceof Error && <p className="mt-4 text-xs text-studio-500">{error.message}</p>}
+          </div>
         ) : products.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/15 px-6 py-24 text-center"><p className="font-display text-2xl">{search ? "No tools match that search." : "The collection is being tuned."}</p><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-studio-400">Connect your Medusa catalog to populate this room with available rental gear and digital products.</p></div>
         ) : (

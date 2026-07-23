@@ -1,15 +1,11 @@
-const MEDUSA_BASE_URL = import.meta.env.VITE_MEDUSA_API_URL || "https://admin.blame.cz";
-const MEDUSA_PUBLISHABLE_KEY = import.meta.env.VITE_MEDUSA_PUBLISHABLE_KEY || "";
+const MEDUSA_BASE_URL = "/api/medusa";
 
 export const medusaClient = {
-  async get<T,>(endpoint: string, init?: RequestInit): Promise<T> {
+  async get<T>(endpoint: string, init?: RequestInit): Promise<T> {
     const response = await fetch(`${MEDUSA_BASE_URL}${endpoint}`, {
       ...init,
       headers: {
         "Content-Type": "application/json",
-        ...(MEDUSA_PUBLISHABLE_KEY
-          ? { "x-publishable-api-key": MEDUSA_PUBLISHABLE_KEY }
-          : {}),
         ...init?.headers,
       },
     });
@@ -21,7 +17,7 @@ export const medusaClient = {
     return response.json() as Promise<T>;
   },
 
-  async post<T,>(endpoint: string, body?: unknown, init?: RequestInit): Promise<T> {
+  async post<T>(endpoint: string, body?: unknown, init?: RequestInit): Promise<T> {
     return this.get(endpoint, {
       ...init,
       method: "POST",
@@ -29,7 +25,7 @@ export const medusaClient = {
     }) as Promise<T>;
   },
 
-  async put<T,>(endpoint: string, body?: unknown, init?: RequestInit): Promise<T> {
+  async put<T>(endpoint: string, body?: unknown, init?: RequestInit): Promise<T> {
     return this.get(endpoint, {
       ...init,
       method: "PUT",
@@ -37,7 +33,7 @@ export const medusaClient = {
     }) as Promise<T>;
   },
 
-  async delete<T,>(endpoint: string, init?: RequestInit): Promise<T> {
+  async delete<T>(endpoint: string, init?: RequestInit): Promise<T> {
     return this.get(endpoint, {
       ...init,
       method: "DELETE",
@@ -51,11 +47,15 @@ export type StorefrontProduct = {
   description?: string;
   thumbnail?: string;
   images?: { url: string }[];
-  type: "rental" | "digital";
+  type: "rental" | "digital" | "product";
   variants?: {
     id: string;
     title: string;
-    prices: { amount: number; currency_code: string }[];
+    prices?: { amount: number; currency_code: string }[];
+    calculated_price?: {
+      calculated_amount?: number;
+      currency_code?: string;
+    };
   }[];
 };
 

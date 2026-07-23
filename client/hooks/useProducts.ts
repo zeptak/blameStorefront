@@ -8,12 +8,17 @@ interface MedusaProduct {
   thumbnail?: string;
   images?: { url: string }[];
   metadata?: {
-    product_type?: "rental" | "digital";
+    product_type?: "rental" | "digital" | "product";
+    type?: "rental" | "digital" | "product";
   };
   variants?: {
     id: string;
     title: string;
-    prices: { amount: number; currency_code: string }[];
+    prices?: { amount: number; currency_code: string }[];
+    calculated_price?: {
+      calculated_amount?: number;
+      currency_code?: string;
+    };
   }[];
 }
 
@@ -24,38 +29,34 @@ interface MedusaProductsResponse {
   limit: number;
 }
 
+function getProductType(product: MedusaProduct): StorefrontProduct["type"] {
+  return product.metadata?.product_type ?? product.metadata?.type ?? "product";
+}
+
 export function useProducts(type?: "rental" | "digital", search?: string) {
   return useQuery({
     queryKey: ["products", type, search],
     queryFn: async () => {
-      try {
-        // Fetch products from MedusaJS store endpoint
-        const params = new URLSearchParams();
-        if (search) params.append("q", search);
-        if (type) params.append("metadata[product_type]", type);
+      const params = new URLSearchParams();
+      if (search) params.append("q", search);
 
-        const response = await medusaClient.get<MedusaProductsResponse>(
-          `/store/products?${params.toString()}`
-        );
+      const response = await medusaClient.get<MedusaProductsResponse>(
+        `/products?${params.toString()}`
+      );
 
-        // Transform MedusaJS products to StorefrontProduct
-        const products: StorefrontProduct[] = (response.products || []).map(
-          (p: MedusaProduct) => ({
-            id: p.id,
-            title: p.title,
-            description: p.description,
-            thumbnail: p.thumbnail,
-            images: p.images,
-            type: (p.metadata?.product_type || "rental") as "rental" | "digital",
-            variants: p.variants,
+      return (response.products || [])
+        .map(
+          (product): StorefrontProduct => ({
+            id: product.id,
+            title: product.title,
+            description: product.description,
+            thumbnail: product.thumbnail,
+            images: product.images,
+            type: getProductType(product),
+            variants: product.variants,
           })
-        );
-
-        return products;
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-        return [];
-      }
+        )
+        .filter((product) => !type || product.type === type);
     },
   });
 }
