@@ -1,4 +1,5 @@
 const MEDUSA_BASE_URL = import.meta.env.VITE_MEDUSA_API_URL || "https://admin.blame.cz";
+const MEDUSA_PUBLISHABLE_KEY = import.meta.env.VITE_MEDUSA_PUBLISHABLE_KEY || "";
 
 export const medusaClient = {
   async get<T,>(endpoint: string, init?: RequestInit): Promise<T> {
@@ -6,6 +7,9 @@ export const medusaClient = {
       ...init,
       headers: {
         "Content-Type": "application/json",
+        ...(MEDUSA_PUBLISHABLE_KEY
+          ? { "x-publishable-api-key": MEDUSA_PUBLISHABLE_KEY }
+          : {}),
         ...init?.headers,
       },
     });
